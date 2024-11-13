@@ -1,3 +1,4 @@
+import { WalletProvider } from './context/WalletContext';
 import ConnectWallet from './components/ConnectWallet';
 import LuxuryItemVerifier from './components/LuxuryItemVerifier';
 import reactLogo from './assets/react.svg';
@@ -16,8 +17,10 @@ function App() {
         </a>
       </div>
       <h1>Luxury Item Verification DApp</h1>
-      <ConnectWallet />
-      <LuxuryItemVerifier />
+      <WalletProvider>
+        <ConnectWallet />
+        <LuxuryItemVerifier />
+      </WalletProvider>
     </>
   );
 }

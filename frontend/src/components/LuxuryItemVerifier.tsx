@@ -1,39 +1,48 @@
-import { useState } from 'react';
-import { BrowserProvider, Contract } from 'ethers';
-import LuxuryItemAuthABI from '../abis/LuxuryItemAuth.json';
-import { LuxuryItemAuth } from '../../../typechain-types';
+import { useState, FC, FormEvent } from 'react';
+import { useLuxuryItemAuth } from '../hooks/useLuxuryItemAuth';
 
-const contractAddress = '0xd89bc1AF366C635Be169bDC9d420A32848C77821';
+const LuxuryItemVerifier: FC = () => {
+  const { verificationResult, registerMessage, verifyItem, registerItem } = useLuxuryItemAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-const LuxuryItemVerifier: React.FC = () => {
-  const [serialNumber, setSerialNumber] = useState('');
-  const [verificationResult, setVerificationResult] = useState<[string, string, bigint, boolean] | null>(null);
+  const handleVerifySubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const serialNumber = formData.get('serialNumber') as string;
 
-  const verifyItem = async () => {
-    if (!window.ethereum) return alert('MetaMask is not installed');
+    if (serialNumber) {
+      setIsSubmitting(true);
+      await verifyItem(serialNumber);
+      setIsSubmitting(false);
+    } else {
+      alert('Please enter a serial number to verify.');
+    }
+  };
 
-    try {
-      const provider = new BrowserProvider(window.ethereum);
-      const contract = new Contract(contractAddress, LuxuryItemAuthABI, provider) as unknown as LuxuryItemAuth;
-      const result = await contract.verifyItem(serialNumber);
+  const handleRegisterSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const serialNumber = formData.get('serialNumber') as string;
+    const manufacturer = formData.get('manufacturer') as string;
 
-      setVerificationResult(result);
-    } catch (error) {
-      console.error('Verification failed:', error);
-      alert('Item not found or verification failed');
+    if (serialNumber && manufacturer) {
+      setIsSubmitting(true);
+      await registerItem(serialNumber, manufacturer);
+      setIsSubmitting(false);
+    } else {
+      alert('Please enter both a serial number and a manufacturer to register.');
     }
   };
 
   return (
     <div>
       <h2>Verify Luxury Item</h2>
-      <input
-        type="text"
-        placeholder="Enter serial number"
-        value={serialNumber}
-        onChange={(e) => setSerialNumber(e.target.value)}
-      />
-      <button onClick={verifyItem}>Verify Item</button>
+      <form onSubmit={handleVerifySubmit}>
+        <input type="text" name="serialNumber" placeholder="Enter serial number" />
+        <button type="submit" disabled={isSubmitting}>
+          Verify Item
+        </button>
+      </form>
       {verificationResult && (
         <div>
           <p>Manufacturer: {verificationResult[0]}</p>
@@ -42,6 +51,16 @@ const LuxuryItemVerifier: React.FC = () => {
           <p>Is Authentic: {verificationResult[3] ? 'Yes' : 'No'}</p>
         </div>
       )}
+
+      <h2>Register New Luxury Item</h2>
+      <form onSubmit={handleRegisterSubmit}>
+        <input type="text" name="serialNumber" placeholder="Enter serial number" />
+        <input type="text" name="manufacturer" placeholder="Enter manufacturer" />
+        <button type="submit" disabled={isSubmitting}>
+          Register Item
+        </button>
+      </form>
+      {registerMessage && <p>{registerMessage}</p>}
     </div>
   );
 };
