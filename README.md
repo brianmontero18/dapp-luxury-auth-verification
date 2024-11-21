@@ -127,7 +127,7 @@ Key operations performed after deployment, including minting a sample luxury ite
 
 - **Registered New Item (TREN with serial number 11132024)**: [0x63d568ff1ef46c7acbed65c3a8aee41f0ec5a185085a7d7ebe805caeb82e9cbb](https://sepolia.etherscan.io/tx/0x63d568ff1ef46c7acbed65c3a8aee41f0ec5a185085a7d7ebe805caeb82e9cbb)
 
-## Proposed enhancements for the DApp
+## Proposed enhancements for the DApp (SPRINT 3)
 
 ### 1 - What visual improvements would I introduce to the DApp?
 
